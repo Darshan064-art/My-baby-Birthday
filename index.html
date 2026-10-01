@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>A little something for you ❤️</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Nunito', sans-serif;
+      background: #fdf5ec;
+      color: #5a353c;
+    }
+
+    /* Sound Control Button */
+    .sound-btn {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      z-index: 1000;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 55px 24px 40px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: 10;
+    }
+    .screen.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    /* Primary Pill Button */
+    .btn-action {
+      background: linear-gradient(90deg, #ff8463, #ffaa72);
+      color: #ffffff;
+      border: none;
+      padding: 15px 42px;
+      border-radius: 35px;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      box-shadow: 0 10px 25px rgba(255, 132, 99, 0.4);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-action:active {
+      transform: scale(0.95);
+      box-shadow: 0 5px 15px rgba(255, 132, 99, 0.3);
+    }
+
+    /* Screen 1: Bow & Heart */
+    #s1 {
+      background: radial-gradient(circle at center, #fff9f4 0%, #fae6de 100%);
+    }
+    .top-hint {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: #9c606b;
+      font-size: 17px;
+    }
+    .heart-glow-box {
+      margin: auto 0;
+      position: relative;
+    }
+    .glow-aura {
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(255, 150, 175, 0.6) 0%, rgba(255, 255, 255, 0) 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      filter: blur(20px);
+      z-index: 1;
+      animation: pulseGlow 2.5s infinite alternate;
+    }
+    @keyframes pulseGlow {
+      from { transform: translate(-50%, -50%) scale(0.9); opacity: 0.7; }
+      to { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+    }
+    .main-pink-heart {
+      font-size: 95px;
+      position: relative;
+      z-index: 2;
+      filter: drop-shadow(0 15px 25px rgba(255, 80, 120, 0.35));
+    }
+    .bow-pull-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    .bow-icon {
+      font-size: 45px;
+      transition: transform 0.2s;
+    }
+    .bow-pull-area:active .bow-icon {
+      transform: translateY(12px) scale(0.9);
+    }
+    .pull-text {
+      font-size: 12px;
+      letter-spacing: 3px;
+      font-weight: 800;
+      color: #b06e78;
+    }
+
+    /* Screen 2: Sunburst & Heart Tree */
+    #s2 {
+      background: radial-gradient(circle at top, #fffaf6 0%, #fbe8e0 100%);
+      position: relative;
+      overflow: hidden;
+      justify-content: center;
+      gap: 30px;
+    }
+    .sunburst-bg {
+      position: absolute;
+      inset: 0;
+      background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.45) 0deg 15deg, transparent 15deg 30deg);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .tree-wrapper {
+      position: relative;
+      z-index: 2;
+    }
+    .heart-bouquet {
+      font-size: 120px;
+      filter: drop-shadow(0 15px 30px rgba(255, 100, 130, 0.35));
+      animation: floatBouquet 3s infinite ease-in-out;
+    }
+    @keyframes floatBouquet {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    .hbd-tag {
+      font-size: 14px;
+      font-style: italic;
+      color: #925362;
+      margin-bottom: 4px;
+    }
+    .hbd-name {
+      font-size: 34px;
+      font-weight: 900;
+      color: #cf3a63;
+      line-height: 1.2;
+    }
+    .hbd-age {
+      font-size: 16px;
+      font-weight: 600;
+      color: #8c5260;
+      margin-top: 10px;
+    }
+    .tap-hint {
+      font-size: 13px;
+      color: #b57a86;
+      letter-spacing: 1px;
+    }
+
+    /* Screen 3: Dark Starlight Cake */
+    #s3 {
+      background: linear-gradient(180deg, #180d28 0%, #291238 100%);
+      color: #fff;
+    }
+    .cake-wrap {
+      position: relative;
+      margin: auto 0;
+      cursor: pointer;
+    }
+    .cake-candle-flame {
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 30px;
+      animation: flameWiggle 0.25s infinite alternate;
+      transition: opacity 0.5s;
+    }
+    @keyframes flameWiggle {
+      from { transform: translateX(-50%) scale(1) rotate(-3deg); }
+      to { transform: translateX(-50%) scale(1.15) rotate(3deg); filter: drop-shadow(0 0 15px #ffaa00); }
+    }
+    .cake-candle-flame.blown {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .cake-graphic {
+      font-size: 120px;
+      filter: drop-shadow(0 15px 35px rgba(255, 175, 75, 0.45));
+    }
+
+    /* Screen 4: Pop The Balloons & Reasons */
+    #s4 {
+      background: linear-gradient(180deg, #180d28 0%, #291238 100%);
+      color: #fff;
+    }
+    .balloon-stage {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin: 25px 0 15px;
+    }
+    .balloon-item {
+      font-size: 55px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .balloon-item.popped {
+      visibility: hidden;
+      opacity: 0;
+      transform: scale(1.5);
+    }
+    .reasons-box {
+      width: 100%;
+      max-width: 375px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin: 10px 0 auto;
+    }
+    .reason-strip {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      padding: 12px 16px;
+      text-align: left;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: all 0.4s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    }
+    .reason-strip.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reason-tag {
+      font-size: 11px;
+      font-weight: 800;
+      color: #ffa86e;
+      letter-spacing: 0.8px;
+      margin-bottom: 2px;
+    }
+    .reason-body {
+      font-size: 13.5px;
+      color: #f7e6e9;
+      font-weight: 600;
+    }
+
+    /* Screen 5: Memory Lane */
+    #s5 {
+      background: linear-gradient(180deg, #180d28 0%, #281236 100%);
+      color: #fff;
+    }
+    .slider-track {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 20px;
+      width: 100%;
+      padding: 25px 15px;
+      scrollbar-width: none;
+    }
+    .slider-track::-webkit-scrollbar { display: none; }
+    .card-polaroid {
+      flex: 0 0 260px;
+      scroll-snap-align: center;
+      background: #ffffff;
+      padding: 12px 12px 25px;
+      border-radius: 6px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.65);
+      color: #2b2b2b;
+      transform: rotate(-1.5deg);
+    }
+    .card-polaroid:nth-child(even) {
+      transform: rotate(2deg);
+    }
+    .card-polaroid img {
+      width: 100%;
+      height: 270px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .polaroid-text {
+      margin-top: 12px;
+      font-family: 'Caveat', cursive;
+      font-size: 22px;
+      font-weight: 700;
+      color: #55343d;
+    }
+
+    /* Screen 6: Sealed Envelope */
+    #s6 {
+      background: linear-gradient(180deg, #180d28 0%, #291238 100%);
+      color: #fff;
+    }
+    .envelope-box {
+      margin: auto 0;
+      position: relative;
+      cursor: pointer;
+    }
+    .envelope-gold {
+      width: 250px;
+      height: 165px;
+      background: linear-gradient(135deg, #df9b42, #c67f2a);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.6);
+      position: relative;
+    }
+    .envelope-gold::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 0;
+      border-left: 125px solid transparent;
+      border-right: 125px solid transparent;
+      border-top: 95px solid #ebb25e;
+      border-radius: 10px 10px 0 0;
+    }
+    .wax-seal {
+      width: 55px;
+      height: 55px;
+      background: radial-gradient(circle, #f3cf7c, #b97a22);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 24px;
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      position: relative;
+      z-index: 5;
+    }
+
+    /* Screen 7: The Final Paper Letter */
+    #s7 {
+      background: linear-gradient(180deg, #180d28 0%, #291238 100%);
+      color: #fff;
+      justify-content: center;
+    }
+    .sheet-paper {
+      background: #fdf5ea;
+      color: #38241d;
+      padding: 30px 24px;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 360px;
+      text-align: left;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+      background-image: repeating-linear-gradient(#fdf5ea, #fdf5ea 28px, #eeddce 29px);
+      line-height: 29px;
+    }
+    .letter-salutation {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #6d3319;
+      margin-bottom: 8px;
+    }
+    .letter-content {
+      font-size: 14.5px;
+      color: #442a22;
+      word-break: break-word;
+    }
+    .letter-close {
+      margin-top: 15px;
+      text-align: right;
+      font-family: 'Caveat', cursive;
+      font-size: 24px;
+      font-weight: 700;
+      color: #7b3d11;
+    }
+  </style>
+</head>
+<body>
+
+  <audio id="bgSong" loop>
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
+  <button class="sound-btn" onclick="toggleAudio()">🎵</button>
+
+  <!-- SCREEN 1: PULL & RELEASE BOW -->
+  <div class="screen active" id="s1">
+    <div class="top-hint">a little something, for you</div>
+    <div class="heart-glow-box">
+      <div class="glow-aura"></div>
+      <div class="main-pink-heart">💗</div>
+    </div>
+    <div class="bow-pull-area" onclick="triggerBowShoot()">
+      <div class="bow-icon" id="bowIcon">🏹</div>
+      <div class="pull-text">PULL & RELEASE</div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: HEART TREE & BIRTHDAY TITLE -->
+  <div class="screen" id="s2" onclick="goScreen(3)">
+    <div class="sunburst-bg"></div>
+    <div class="tree-wrapper">
+      <div class="heart-bouquet">🌸</div>
+    </div>
+    <div style="position: relative; z-index: 2;">
+      <div class="hbd-tag">it's officially your day</div>
+      <div class="hbd-name">Happy Birthday,<br>Amtul Basit</div>
+      <div class="hbd-age">and just like that, you're turning 22 ✨</div>
+    </div>
+    <div class="tap-hint" style="position: relative; z-index: 2;">tap anywhere to continue</div>
+  </div>
+
+  <!-- SCREEN 3: FIRST THINGS FIRST CAKE -->
+  <div class="screen" id="s3">
+    <div>
+      <h2 style="font-size: 24px; font-weight: 800;">First things first 🎂</h2>
+      <p style="font-size: 13px; color: #d0b8d8; margin-top: 4px;">Make a wish and blow the candle</p>
+    </div>
+    <div class="cake-wrap" onclick="blowCandle()">
+      <div class="cake-candle-flame" id="flameIcon">🔥</div>
+      <div class="cake-graphic">🎂</div>
+    </div>
+    <div>
+      <div id="cakePrompt" style="font-size: 14px; color: #ffbe84; margin-bottom: 15px;">Tap the candle to blow it out 🕯️</div>
+      <button class="btn-action" id="cakeNext" onclick="goScreen(4)" style="display: none;">Continue 💕</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: POP BALLOONS & REASONS -->
+  <div class="screen" id="s4">
+    <div>
+      <h2 style="font-size: 22px; font-weight: 800;">Pop the balloons 🎈</h2>
+      <p style="font-size: 13px; color: #c4abd0; margin-top: 4px;">5 balloons. Each holds a reason you're loved.</p>
+    </div>
+    <div class="balloon-stage">
+      <span class="balloon-item" onclick="popOne(1, this)">🎈</span>
+      <span class="balloon-item" onclick="popOne(2, this)">🎈</span>
+      <span class="balloon-item" onclick="popOne(3, this)">🎈</span>
+      <span class="balloon-item" onclick="popOne(4, this)">🎈</span>
+      <span class="balloon-item" onclick="popOne(5, this)">🎈</span>
+    </div>
+    <div class="reasons-box">
+      <div class="reason-strip" id="r1"><div class="reason-tag">REASON NO. 1 🎈</div><div class="reason-body">Your laugh is my favourite sound</div></div>
+      <div class="reason-strip" id="r2"><div class="reason-tag">REASON NO. 2 🎈</div><div class="reason-body">You believed in me when I didn't</div></div>
+      <div class="reason-strip" id="r3"><div class="reason-tag">REASON NO. 3 🎈</div><div class="reason-body">You remember the little things I forget</div></div>
+      <div class="reason-strip" id="r4"><div class="reason-tag">REASON NO. 4 🎈</div><div class="reason-body">My worst days get shorter when you call</div></div>
+      <div class="reason-strip" id="r5"><div class="reason-tag">REASON NO. 5 🎈</div><div class="reason-body">You make ordinary days feel special</div></div>
+    </div>
+    <button class="btn-action" id="reasonsNext" onclick="goScreen(5)" style="display: none;">Keep going 💛</button>
+  </div>
+
+  <!-- SCREEN 5: POLAROID MEMORIES -->
+  <div class="screen" id="s5">
+    <div>
+      <h2 style="font-size: 22px; font-weight: 800;">A walk down memory lane</h2>
+      <p style="font-size: 13px; color: #c4abd0; margin-top: 4px;">swipe through 📸</p>
+    </div>
+    <div class="slider-track">
+      <div class="card-polaroid">
+        <img src="memory1.jpg" onerror="this.src='https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=500'" alt="Memory 1">
+        <div class="polaroid-text">Always & Forever 💛</div>
+      </div>
+      <div class="card-polaroid">
+        <img src="memory2.jpg" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500'" alt="Memory 2">
+        <div class="polaroid-text">My Favorite Smile ✨</div>
+      </div>
+    </div>
+    <button class="btn-action" onclick="goScreen(6)">Keep going 💛</button>
+  </div>
+
+  <!-- SCREEN 6: WAX ENVELOPE -->
+  <div class="screen" id="s6">
+    <div>
+      <h2 style="font-size: 22px; font-weight: 800;">One last thing, Amtul Basit...</h2>
+      <p style="font-size: 14px; color: #c8b2d4; margin-top: 5px;">Darshan wrote you a letter.</p>
+    </div>
+    <div class="envelope-box" onclick="goScreen(7)">
+      <div class="envelope-gold">
+        <div class="wax-seal">A</div>
+      </div>
+    </div>
+    <button class="btn-action" onclick="goScreen(7)">Tap to open your letter 💌</button>
+  </div>
+
+  <!-- SCREEN 7: LETTER REVEAL -->
+  <div class="screen" id="s7">
+    <div class="sheet-paper">
+      <div class="letter-salutation">Dear Amtul Basit,</div>
+      <div class="letter-content">
+        I keep thinking about how lucky I got with you. You have seen me at my worst and stayed anyway, and I do not say thank you nearly enough for that 🤍 This year, I hope life is gentle with you… I love you bohooooooooooooooooooot saaraaaaaa my dear princess 🫂🏻🥹❤️❤️‍🩹🫂🏻😘😘😘😘😘😘😘
+      </div>
+      <div class="letter-close">
+        With all my love,<br>— Darshan 🎂
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function goScreen(idx) {
+      document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById('s' + idx);
+      if (target) {
+        target.classList.add('active');
+        if (idx === 7 || idx === 2) {
+          confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+        }
+      }
+    }
+
+    function triggerBowShoot() {
+      confetti({ particleCount: 60, spread: 80, origin: { y: 0.5 } });
+      setTimeout(() => { goScreen(2); }, 350);
+    }
+
+    function blowCandle() {
+      const fl = document.getElementById('flameIcon');
+      const hint = document.getElementById('cakePrompt');
+      const btn = document.getElementById('cakeNext');
+      if (!fl.classList.contains('blown')) {
+        fl.classList.add('blown');
+        hint.innerHTML = "✨ Wish granted! Happy Birthday! ✨";
+        hint.style.color = "#8affb8";
+        btn.style.display = "inline-flex";
+        confetti({ particleCount: 90, spread: 80, origin: { y: 0.55 } });
+      }
+    }
+
+    let poppedCount = 0;
+    function popOne(id, elem) {
+      if (!elem.classList.contains('popped')) {
+        elem.classList.add('popped');
+        document.getElementById('r' + id).classList.add('show');
+        confetti({ particleCount: 20, spread: 45, origin: { y: 0.4 } });
+        poppedCount++;
+        if (poppedCount >= 5) {
+          document.getElementById('reasonsNext').style.display = "inline-flex";
+        }
+      }
+    }
+
+    function toggleAudio() {
+      const a = document.getElementById('bgSong');
+      if (a.paused) {
+        a.play().catch(e => console.log('Audio autoplay'));
+      } else {
+        a.pause();
+      }
+    }
+  </script>
+</body>
+  </html>
+      
